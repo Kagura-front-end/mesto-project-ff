@@ -2,7 +2,7 @@ const cardTemplate = document.querySelector("#card-template").content;
 const citiesList = document.querySelector(".places__list");
 
 
-function DeleteFunction(card) {
+function deleteFunction(card) {
     card.remove();
 }
 
@@ -31,7 +31,7 @@ function addingCard(cardInfo, deleteCallback) {
 
 function renderCards(cardsArray) {
     cardsArray.forEach(function (cardInfo) {
-        const cardElement = addingCard(cardInfo, DeleteFunction);
+        const cardElement = addingCard(cardInfo, deleteFunction);
         citiesList.appendChild(cardElement);
     });
 }
