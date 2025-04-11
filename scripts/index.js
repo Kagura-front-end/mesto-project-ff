@@ -1,41 +1,40 @@
-const cardTemplate = document.querySelector("#card-template").content;
-const citiesList = document.querySelector(".places__list");
+import {
+    editButton,
+    addButton,
+    editForm,
+    addForm,
+    nameInput,
+    jobInput,
+    profileTitle,
+    profileDescription,
+    editPopup,
+    addPopup,
+    imagePopup
+} from '../src/components/constants.js';
+import {initModals, openModal, closeModal} from '../src/components/Modal.js';
+import {createCard, toggleLike, deleteCard, renderCards} from '../src/components/Card.js';
+import {handleEditFormSubmit, handleAddFormSubmit} from '../src/components/handlers.js';
 
+// Инициализация модальных окон
+initModals();
 
-function deleteFunction(card) {
-    card.remove();
-}
+// Обработчики кнопок
+editButton.addEventListener('click', function () {
+    nameInput.value = profileTitle.textContent;
+    jobInput.value = profileDescription.textContent;
+    openModal(editPopup);
+});
 
+addButton.addEventListener('click', function () {
+    addForm.reset();
+    openModal(addPopup);
+});
 
-function addingCard(cardInfo, deleteCallback) {
-    const card = cardTemplate.querySelector(".card");
-    const cardElement = card.cloneNode(true);
-    const cardImage = cardElement.querySelector(".card__image");
-    const cityName = cardElement.querySelector(".card__title");
-    const deleteButton = cardElement.querySelector(".card__delete-button");
+// Обработчики форм
+editForm.addEventListener('submit', handleEditFormSubmit);
+addForm.addEventListener('submit', function (evt) {
+    handleAddFormSubmit(evt, createCard, deleteCard, toggleLike);
+});
 
-
-    cardImage.src = cardInfo.link;
-    cardImage.alt = cardInfo.name;
-    cityName.textContent = cardInfo.name;
-
-
-    deleteButton.addEventListener("click", function () {
-        deleteCallback(cardElement);
-    });
-
-
-    return cardElement;
-}
-
-
-function renderCards(cardsArray) {
-    cardsArray.forEach(function (cardInfo) {
-        const cardElement = addingCard(cardInfo, deleteFunction);
-        citiesList.appendChild(cardElement);
-    });
-}
-
-
+// Рендер начальных карточек
 renderCards(initialCards);
-
