@@ -1,7 +1,7 @@
 {
-  "name": "sborka",
+  "name": "mesto-project-ff",
   "version": "1.0.0",
-  "description": "",
+  "description": "this is project 6",
   "main": "index.js",
   "mode": "development",
   "scripts": {
