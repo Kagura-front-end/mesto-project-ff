@@ -1,26 +1,46 @@
-console.log('Hello, World!');
+const cssContext = require.context('/src/css', true, /\.css$/i, 'sync');
+cssContext.keys().forEach(cssContext);
 
-const numbers = [2, 3, 5];
+import {
+    editButton,
+    addButton,
+    editForm,
+    addForm,
+    nameInput,
+    jobInput,
+    profileTitle,
+    profileDescription,
+    editPopup,
+    addPopup
+} from '../src/js/constants.js';
 
-// Стрелочная функция. Не запнётся ли на ней Internet Explorer?
-const doubledNumbers = numbers.map(number => number * 2);
+import {initialPlaces} from './js/places.js';
+// Рендер начальных карточек
+renderCards(initialPlaces);
 
-console.log(doubledNumbers); // 4, 6, 10 
+import {initModals, openModal, closeModal} from '../src/js/modal.js';
+// Инициализация модальных окон
+initModals();
 
-const jordanImage = new URL('./images/jordan.jpg', import.meta.url);
-const jamesImage = new URL('./images/james.jpg', import.meta.url);
-const bryantImage = new URL('./images/bryant.jpg', import.meta.url)
+import {createCard, toggleLike, deleteCard, renderCards} from '../src/js/card.js';
+import {handleEditFormSubmit, handleAddFormSubmit} from '../src/js/handlers.js';
 
-const whoIsTheGoat = [
-    // меняем исходные пути на переменные
-    {name: 'Michael Jordan', link: jordanImage},
-    {name: 'Lebron James', link: jamesImage},
-    {name: 'Kobe Bryant', link: bryantImage},
-];
 
-<img src="<%=require('./images/logo.png')%>" alt="Логотип">
+// Обработчики кнопок
+editButton.addEventListener('click', function () {
+    nameInput.value = profileTitle.textContent;
+    jobInput.value = profileDescription.textContent;
+    openModal(editPopup);
+});
 
-    // Научим «Вебпак» динамически заменять пути в HTML-файле. С этим поможет HtmlWebpackPlugin: он умеет корректно
-    подставлять правильные пути файлов. Для этого потребуется изменить привычный путь до изображения на такой
+addButton.addEventListener('click', function () {
+    addForm.reset();
+    openModal(addPopup);
+});
 
-    import './styles/index.css';
+// Обработчики форм
+editForm.addEventListener('submit', handleEditFormSubmit);
+addForm.addEventListener('submit', function (evt) {
+    handleAddFormSubmit(evt, createCard, deleteCard, toggleLike);
+});
+
