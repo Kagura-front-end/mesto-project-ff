@@ -11,8 +11,6 @@ import {
     citiesList
 } from './constants.js';
 
-/*import {createCard, toggleLike, deleteCard} from './card.js';*/
-
 export function handleEditFormSubmit(evt) {
     evt.preventDefault();
     profileTitle.textContent = nameInput.value;

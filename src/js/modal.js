@@ -1,5 +1,3 @@
-import {editPopup, addPopup, imagePopup} from './constants.js';
-
 export function openModal(popup) {
     popup.classList.add('popup_opened');
     document.addEventListener('keydown', closeByEscape);
@@ -13,28 +11,15 @@ export function closeModal(popup) {
 function closeByEscape(evt) {
     if (evt.key === 'Escape') {
         const openedPopup = document.querySelector('.popup_opened');
-        if (openedPopup) {
-            closeModal(openedPopup);
-        }
+        if (openedPopup) closeModal(openedPopup);
     }
 }
 
 export function setupPopup(popup) {
     const closeButton = popup.querySelector('.popup__close');
 
-    closeButton.addEventListener('click', function () {
-        closeModal(popup);
+    closeButton.addEventListener('click', () => closeModal(popup));
+    popup.addEventListener('mousedown', (evt) => {
+        if (evt.target === evt.currentTarget) closeModal(popup);
     });
-
-    popup.addEventListener('mousedown', function (evt) {
-        if (evt.target === evt.currentTarget) {
-            closeModal(evt.currentTarget);
-        }
-    });
-}
-
-export function initModals() {
-    setupPopup(editPopup);
-    setupPopup(addPopup);
-    setupPopup(imagePopup);
 }

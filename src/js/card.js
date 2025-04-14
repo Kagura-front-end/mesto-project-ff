@@ -1,7 +1,6 @@
 import {cardTemplate, citiesList} from './constants.js';
-import {openModal} from './modal.js';
 
-export function createCard(cardInfo, deleteCallback, likeCallback) {
+export function createCard(cardInfo, deleteCallback, likeCallback, handleImageClick) {
     const card = cardTemplate.querySelector('.card').cloneNode(true);
     const cardImage = card.querySelector('.card__image');
     const cityName = card.querySelector('.card__title');
@@ -12,23 +11,9 @@ export function createCard(cardInfo, deleteCallback, likeCallback) {
     cardImage.alt = cardInfo.name;
     cityName.textContent = cardInfo.name;
 
-    deleteButton.addEventListener('click', function () {
-        deleteCallback(card);
-    });
-
+    deleteButton.addEventListener('click', () => deleteCallback(card));
     likeButton.addEventListener('click', likeCallback);
-
-    cardImage.addEventListener('click', function () {
-        const imagePopup = document.querySelector('.popup_type_image');
-        const popupImage = imagePopup.querySelector('.popup__image');
-        const popupCaption = imagePopup.querySelector('.popup__caption');
-
-        popupImage.src = cardInfo.link;
-        popupImage.alt = cardInfo.name;
-        popupCaption.textContent = cardInfo.name;
-
-        openModal(imagePopup);
-    });
+    cardImage.addEventListener('click', () => handleImageClick(cardInfo));
 
     return card;
 }
@@ -41,9 +26,9 @@ export function deleteCard(card) {
     card.remove();
 }
 
-export function renderCards(cardsArray) {
-    cardsArray.forEach(function (cardInfo) {
-        const cardElement = createCard(cardInfo, deleteCard, toggleLike);
+export function renderCards(cardsArray, handleImageClick) {
+    cardsArray.forEach((cardInfo) => {
+        const cardElement = createCard(cardInfo, deleteCard, toggleLike, handleImageClick);
         citiesList.appendChild(cardElement);
     });
 }

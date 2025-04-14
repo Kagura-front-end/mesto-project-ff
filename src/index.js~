@@ -15,10 +15,10 @@ import {
     imagePopup
 } from '../src/js/constants.js';
 
-import {initialPlaces} from './js/places.js';
-import {openModal, setupPopup} from '../src/js/modal.js';
-import {createCard, toggleLike, deleteCard, renderCards} from '../src/js/card.js';
-import {handleEditFormSubmit, handleAddFormSubmit} from '../src/js/handlers.js';
+import { initialPlaces } from './js/places.js';
+import { openModal, setupPopup } from '../src/js/modal.js';
+import { createCard, toggleLike, deleteCard, renderCards } from '../src/js/card.js';
+import { handleEditFormSubmit, handleAddFormSubmit } from '../src/js/handlers.js';
 
 const popupImage = imagePopup.querySelector('.popup__image');
 const popupCaption = imagePopup.querySelector('.popup__caption');
