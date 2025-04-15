@@ -32,3 +32,4 @@ export function renderCards(cardsArray, handleImageClick) {
         citiesList.appendChild(cardElement);
     });
 }
+
