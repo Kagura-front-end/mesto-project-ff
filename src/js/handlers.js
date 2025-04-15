@@ -18,14 +18,14 @@ export function handleEditFormSubmit(evt) {
     closeModal(editPopup);
 }
 
-export function handleAddFormSubmit(evt, createCardFn, deleteCardFn, toggleLikeFn) {
+export function handleAddFormSubmit(evt, createCardFn, deleteCardFn, toggleLikeFn, handleImageClick) {
     evt.preventDefault();
     const newCard = {
         name: cardNameInput.value,
         link: cardUrlInput.value
     };
 
-    const cardElement = createCardFn(newCard, deleteCardFn, toggleLikeFn);
+    const cardElement = createCardFn(newCard, deleteCardFn, toggleLikeFn, handleImageClick);
     citiesList.prepend(cardElement);
 
     evt.target.reset();
