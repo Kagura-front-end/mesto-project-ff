@@ -3,10 +3,12 @@ export function openModal(popup) {
     document.addEventListener('keydown', closeByEscape);
 }
 
+
 export function closeModal(popup) {
     popup.classList.remove('popup_opened');
     document.removeEventListener('keydown', closeByEscape);
 }
+
 
 function closeByEscape(evt) {
     if (evt.key === 'Escape') {
@@ -15,8 +17,10 @@ function closeByEscape(evt) {
     }
 }
 
+
 export function setupPopup(popup) {
     const closeButton = popup.querySelector('.popup__close');
+
 
     closeButton.addEventListener('click', () => closeModal(popup));
     popup.addEventListener('mousedown', (evt) => {

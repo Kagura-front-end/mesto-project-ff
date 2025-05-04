@@ -16,20 +16,12 @@
 }
 
 .popup__input:not(:placeholder-shown) {
-    color: #000;
+    color: #000; /* Text color when typing */
 }
 
 .popup__input::placeholder {
     color: #C4C4C4;
     transition: color 0.3s;
-}
-
-.popup__input:focus::placeholder {
-    color: transparent;
-}
-
-.popup__input_type_error {
-    border-bottom: 1px solid #FF0000;
 }
 
 .popup__input:last-of-type {

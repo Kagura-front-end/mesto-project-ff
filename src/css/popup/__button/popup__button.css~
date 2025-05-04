@@ -24,7 +24,7 @@
     color: #000000;
     opacity: 0.2;
     pointer-events: none;
-    border: 1px solid black;
+    border-color: black solid 1px;
 }
 
 /* Active/pressed button styles */
