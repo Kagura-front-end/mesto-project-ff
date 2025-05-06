@@ -173,7 +173,6 @@ cardUrlInput.addEventListener('input', () => {
     }
 }); */
 
-
 const cssContext = require.context('./css', true, /\.css$/i, 'sync');
 cssContext.keys().forEach(cssContext);
 
@@ -295,14 +294,25 @@ addForm.addEventListener('submit', (evt) => {
 
 avatarForm.addEventListener('submit', (evt) => {
     evt.preventDefault();
-    if (avatarSubmitButton.disabled) return;
+    if (!avatarInput || avatarSubmitButton.disabled) return;
+
+    const avatarUrl = avatarInput.value;
+    if (!avatarUrl) return;
+
     renderLoading(avatarSubmitButton, true);
-    updateAvatar(avatarInput.value)
+    updateAvatar(avatarUrl)
         .then(userData => {
             profileAvatar.style.backgroundImage = `url(${userData.avatar})`;
             closeModal(avatarPopup);
         })
-        .catch(err => console.error('Error updating avatar:', err))
+        .catch(err => {
+            console.error('Error updating avatar:', err);
+            const errorElement = avatarForm.querySelector('.avatar-input-error');
+            if (errorElement) {
+                errorElement.textContent = 'Ошибка обновления аватара';
+                errorElement.classList.add('popup__error_visible');
+            }
+        })
         .finally(() => renderLoading(avatarSubmitButton, false));
 });
 

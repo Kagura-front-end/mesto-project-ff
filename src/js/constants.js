@@ -18,19 +18,14 @@ export const avatarForm = document.querySelector('.popup__form[name="update-avat
 
 export const nameInput = editForm.querySelector('.popup__input_type_name');
 export const jobInput = editForm.querySelector('.popup__input_type_description');
-export const nameError = editForm.querySelector('.name-input-error');
-export const jobError = editForm.querySelector('.description-input-error');
 export const editSubmitButton = editForm.querySelector('.popup__button');
 
 export const cardNameInput = addForm.querySelector('.popup__input_type_card-name');
 export const cardUrlInput = addForm.querySelector('.popup__input_type_url');
-export const cardNameError = addForm.querySelector('.place-name-input-error');
-export const cardUrlError = addForm.querySelector('.link-input-error');
 export const addSubmitButton = addForm.querySelector('.popup__button');
 
 export const avatarInput = document.getElementById('avatar-input');
 export const avatarSubmitButton = avatarForm.querySelector('.popup__button');
-
 export const citiesList = document.querySelector('.places__list');
 export const cardTemplate = document.querySelector('#card-template').content;
 
@@ -39,7 +34,6 @@ export const validationSettings = {
     inputSelector: '.popup__input',
     submitButtonSelector: '.popup__button',
     errorElementSelector: '.popup__error',
-
     inactiveButtonClass: 'popup__button_disabled',
     inputErrorClass: 'popup__input_type_error',
     errorClass: 'popup__error_visible'
