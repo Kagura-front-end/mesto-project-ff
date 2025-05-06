@@ -12,7 +12,7 @@ export const defaultErrorMessages = {
     required: 'Это обязательное поле',
     minLength: (min, current) => `Минимальная длина - ${min} символа, сейчас ${current}`,
     maxLength: (max, current) => `Максимальная длина - ${max} символа, сейчас ${current}`,
-    patternMismatch: 'Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы',
+    patternMismatch: 'Разрешены только буквы, пробелы и дефисы',
     urlMismatch: 'Введите URL-адрес (начинается с http:// или https://)',
     imageUrlInvalid: 'Ссылка не ведет на изображение'
 };
