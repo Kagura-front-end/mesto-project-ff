@@ -6,6 +6,17 @@ const config = {
     }
 };
 
+const endpoints = {
+    addNewCard: `${config.baseUrl}/cards`,             // POST , name, link - добавляет новую карточку
+    deleteCard: `${config.baseUrl}/cards/`,            // DELETE , cardId - удаляет карточку
+    getInitialCards: `${config.baseUrl}/cards`,        // GET - возвращает все карточки
+    getUserInfo: `${config.baseUrl}/users/me`,         // GET - возвращает информацию о текущем пользователе
+    likeCard: `${config.baseUrl}/cards/likes/`,        // PUT , cardId - добавляет лайк
+    unlikeCard: `${config.baseUrl}/cards/likes/`,      // DELETE , cardId - удаляет лайк
+    updateAvatar: `${config.baseUrl}/users/me/avatar`, // PATCH , avatar - обновляет аватар
+    updateProfile: `${config.baseUrl}/users/me`,       // PATCH , name, about - обновляет профиль
+};
+
 function checkResponse(res) {
     if (res.ok) {
         return res.json();
@@ -13,58 +24,8 @@ function checkResponse(res) {
     return Promise.reject(`Ошибка: ${res.status}`);
 }
 
-export const getUserInfo = () => {
-    return fetch(`${config.baseUrl}/users/me`, {
-        headers: config.headers
-    })
-        .then(checkResponse);
-};
-
-export const getInitialCards = () => {
-    return fetch(`${config.baseUrl}/cards`, {
-        headers: config.headers
-    })
-        .then(checkResponse);
-};
-
-export const updateProfile = (name, about) => {
-    return fetch(`${config.baseUrl}/users/me`, {
-        method: 'PATCH',
-        headers: config.headers,
-        body: JSON.stringify({
-            name,
-            about
-        })
-    })
-        .then(checkResponse);
-};
-
-export const likeCard = (cardId) => {
-    return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
-        method: 'PUT',
-        headers: config.headers
-    })
-        .then(checkResponse);
-};
-
-export const unlikeCard = (cardId) => {
-    return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
-        method: 'DELETE',
-        headers: config.headers
-    })
-        .then(checkResponse);
-};
-
-export const deleteCard = (cardId) => {
-    return fetch(`${config.baseUrl}/cards/${cardId}`, {
-        method: 'DELETE',
-        headers: config.headers
-    })
-        .then(checkResponse);
-};
-
 export const addNewCard = (name, link) => {
-    return fetch(`${config.baseUrl}/cards`, {
+    return fetch(`${endpoints.addNewCard}`, {
         method: 'POST',
         headers: config.headers,
         body: JSON.stringify({
@@ -75,8 +36,46 @@ export const addNewCard = (name, link) => {
         .then(checkResponse);
 };
 
+export const deleteCard = (cardId) => {
+    return fetch(`${endpoints.deleteCard}${cardId}`, {
+        method: 'DELETE',
+        headers: config.headers
+    })
+        .then(checkResponse);
+};
+
+export const getInitialCards = () => {
+    return fetch(`${endpoints.getInitialCards}`, {
+        headers: config.headers
+    })
+        .then(checkResponse);
+};
+
+export const getUserInfo = () => {
+    return fetch(`${endpoints.getUserInfo}`, {
+        headers: config.headers
+    })
+        .then(checkResponse);
+};
+
+export const likeCard = (cardId) => {
+    return fetch(`${endpoints.likeCard}${cardId}`, {
+        method: 'PUT',
+        headers: config.headers
+    })
+        .then(checkResponse);
+};
+
+export const unlikeCard = (cardId) => {
+    return fetch(`${endpoints.unlikeCard}${cardId}`, {
+        method: 'DELETE',
+        headers: config.headers
+    })
+        .then(checkResponse);
+};
+
 export const updateAvatar = (avatarUrl) => {
-    return fetch(`${config.baseUrl}/users/me/avatar`, {
+    return fetch(`${endpoints.updateAvatar}`, {
         method: 'PATCH',
         headers: config.headers,
         body: JSON.stringify({
@@ -86,10 +85,14 @@ export const updateAvatar = (avatarUrl) => {
         .then(checkResponse);
 };
 
-const endpoints = {
-    baseUrl: 'https://nomoreparties.co/v1/wff-cohort-37',
-    headers: {
-        authorization: 'fcaeb073-c78a-4bd4-8c97-9750945a38c5',
-        'Content-Type': 'application/json'
-    }   
-}
+export const updateProfile = (name, about) => {
+    return fetch(`${endpoints.updateProfile}`, {
+        method: 'PATCH',
+        headers: config.headers,
+        body: JSON.stringify({
+            name,
+            about
+        })
+    })
+        .then(checkResponse);
+};
