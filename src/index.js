@@ -21,18 +21,8 @@ import {
 const popupImage = imagePopup.querySelector('.popup__image');
 const popupCaption = imagePopup.querySelector('.popup__caption');
 
-function renderLoading(button, isLoading, text = 'Сохранить') {
-    button.textContent = isLoading ? 'Сохранение...' : text;
-}
-
-setupPopup(confirmPopup);
-setupDeleteConfirmation();
-
-enableValidation(validationSettings);
-setupPopup(editPopup);
-setupPopup(addPopup);
-setupPopup(imagePopup);
-setupPopup(avatarPopup);
+let currentUserId;
+let currentCards = [];
 
 function handleLikeCard(cardId, likeButton, likeCount) {
     const isLiked = likeButton.classList.contains('card__like-button_is-active');
@@ -47,12 +37,8 @@ function handleLikeCard(cardId, likeButton, likeCount) {
 
 function handleDeleteCard(cardId, cardElement) {
     apiDeleteCard(cardId)
-        .then(() => {
-            cardElement.remove();
-        })
-        .catch(err => {
-            console.error('Error deleting card:', err);
-        });
+        .then(() => cardElement.remove())
+        .catch(err => console.error('Error deleting card:', err));
 }
 
 function handleImageClick(cardInfo) {
@@ -62,104 +48,118 @@ function handleImageClick(cardInfo) {
     openModal(imagePopup);
 }
 
-let currentUserId;
-let currentCards = [];
+function renderLoading(button, isLoading, text = 'Сохранить') {
+    button.textContent = isLoading ? 'Сохранение...' : text;
+}
 
-Promise.all([getUserInfo(), getInitialCards()])
-    .then(([userData, cards]) => {
-        profileTitle.textContent = userData.name;
-        profileDescription.textContent = userData.about;
-        profileAvatar.style.backgroundImage = `url(${userData.avatar})`;
-        currentUserId = userData._id;
-        currentCards = cards;
-        renderCards(currentCards, currentUserId, handleDeleteCard, handleLikeCard, handleImageClick);
-    })
-    .catch(err => console.error('Error loading data:', err));
+function initializeApp() {
+    enableValidation(validationSettings);
+    setupPopup(editPopup);
+    setupPopup(addPopup);
+    setupPopup(imagePopup);
+    setupPopup(avatarPopup);
+    setupPopup(confirmPopup);
+    setupDeleteConfirmation();
 
-editButton.addEventListener('click', () => {
-    nameInput.value = profileTitle.textContent;
-    jobInput.value = profileDescription.textContent;
-    clearValidation(editForm, validationSettings);
-    openModal(editPopup);
-});
-
-addButton.addEventListener('click', () => {
-    addForm.reset();
-    clearValidation(addForm, validationSettings);
-    openModal(addPopup);
-});
-
-avatarEditButton.addEventListener('click', () => {
-    avatarForm.reset();
-    clearValidation(avatarForm, validationSettings);
-    openModal(avatarPopup);
-});
-
-editForm.addEventListener('submit', (evt) => {
-    evt.preventDefault();
-    if (editSubmitButton.disabled) return;
-    renderLoading(editSubmitButton, true);
-    updateProfile(nameInput.value, jobInput.value)
-        .then(userData => {
+    Promise.all([getUserInfo(), getInitialCards()])
+        .then(([userData, cards]) => {
             profileTitle.textContent = userData.name;
             profileDescription.textContent = userData.about;
-            closeModal(editPopup);
-        })
-        .catch(err => console.error('Error updating profile:', err))
-        .finally(() => renderLoading(editSubmitButton, false));
-});
-
-addForm.addEventListener('submit', (evt) => {
-    evt.preventDefault();
-    if (addSubmitButton.disabled) return;
-    renderLoading(addSubmitButton, true, 'Создать');
-    addNewCard(cardNameInput.value, cardUrlInput.value)
-        .then(newCard => {
-            currentCards.unshift(newCard);
-            renderCards(currentCards, currentUserId, handleDeleteCard, handleLikeCard, handleImageClick);
-            addForm.reset();
-            closeModal(addPopup);
-        })
-        .catch(err => console.error('Error adding card:', err))
-        .finally(() => renderLoading(addSubmitButton, false, 'Создать'));
-});
-
-avatarForm.addEventListener('submit', (evt) => {
-    evt.preventDefault();
-    if (!avatarInput || avatarSubmitButton.disabled) return;
-
-    const avatarUrl = avatarInput.value;
-    if (!avatarUrl) return;
-
-    renderLoading(avatarSubmitButton, true);
-    updateAvatar(avatarUrl)
-        .then(userData => {
             profileAvatar.style.backgroundImage = `url(${userData.avatar})`;
-            closeModal(avatarPopup);
+            currentUserId = userData._id;
+            currentCards = cards;
+            renderCards(currentCards, currentUserId, handleDeleteCard, handleLikeCard, handleImageClick);
         })
-        .catch(err => {
-            console.error('Error updating avatar:', err);
-            const errorElement = avatarForm.querySelector('.avatar-input-error');
-            if (errorElement) {
-                errorElement.textContent = 'Ошибка обновления аватара';
-                errorElement.classList.add('popup__error_visible');
-            }
-        })
-        .finally(() => renderLoading(avatarSubmitButton, false));
-});
+        .catch(err => console.error('Error loading data:', err));
+}
 
-cardNameInput.addEventListener('input', () => {
-    if (cardNameInput.validity.tooLong) {
-        cardNameInput.setCustomValidity(`Max length: 30. Current: ${cardNameInput.value.length}`);
-    } else {
-        cardNameInput.setCustomValidity('');
-    }
-});
+function setupEventListeners() {
+    editButton.addEventListener('click', () => {
+        nameInput.value = profileTitle.textContent;
+        jobInput.value = profileDescription.textContent;
+        clearValidation(editForm, validationSettings);
+        openModal(editPopup);
+    });
 
-cardUrlInput.addEventListener('input', () => {
-    if (!cardUrlInput.validity.valid) {
-        cardUrlInput.setCustomValidity('Please enter a valid URL');
-    } else {
-        cardUrlInput.setCustomValidity('');
-    }
-});
+    addButton.addEventListener('click', () => {
+        addForm.reset();
+        clearValidation(addForm, validationSettings);
+        openModal(addPopup);
+    });
+
+    avatarEditButton.addEventListener('click', () => {
+        avatarForm.reset();
+        clearValidation(avatarForm, validationSettings);
+        openModal(avatarPopup);
+    });
+
+    editForm.addEventListener('submit', (evt) => {
+        evt.preventDefault();
+        if (editSubmitButton.disabled) return;
+        renderLoading(editSubmitButton, true);
+        updateProfile(nameInput.value, jobInput.value)
+            .then(userData => {
+                profileTitle.textContent = userData.name;
+                profileDescription.textContent = userData.about;
+                closeModal(editPopup);
+            })
+            .catch(err => console.error('Error updating profile:', err))
+            .finally(() => renderLoading(editSubmitButton, false));
+    });
+
+    addForm.addEventListener('submit', (evt) => {
+        evt.preventDefault();
+        if (addSubmitButton.disabled) return;
+        renderLoading(addSubmitButton, true, 'Создать');
+        addNewCard(cardNameInput.value, cardUrlInput.value)
+            .then(newCard => {
+                currentCards.unshift(newCard);
+                renderCards(currentCards, currentUserId, handleDeleteCard, handleLikeCard, handleImageClick);
+                addForm.reset();
+                closeModal(addPopup);
+            })
+            .catch(err => console.error('Error adding card:', err))
+            .finally(() => renderLoading(addSubmitButton, false, 'Создать'));
+    });
+
+    avatarForm.addEventListener('submit', (evt) => {
+        evt.preventDefault();
+        if (!avatarInput || avatarSubmitButton.disabled) return;
+        const avatarUrl = avatarInput.value;
+        if (!avatarUrl) return;
+        renderLoading(avatarSubmitButton, true);
+        updateAvatar(avatarUrl)
+            .then(userData => {
+                profileAvatar.style.backgroundImage = `url(${userData.avatar})`;
+                closeModal(avatarPopup);
+            })
+            .catch(err => {
+                console.error('Error updating avatar:', err);
+                const errorElement = avatarForm.querySelector('.avatar-input-error');
+                if (errorElement) {
+                    errorElement.textContent = 'Ошибка обновления аватара';
+                    errorElement.classList.add('popup__error_visible');
+                }
+            })
+            .finally(() => renderLoading(avatarSubmitButton, false));
+    });
+
+    cardNameInput.addEventListener('input', () => {
+        cardNameInput.setCustomValidity(
+            cardNameInput.validity.tooLong
+                ? `Max length: 30. Current: ${cardNameInput.value.length}`
+                : ''
+        );
+    });
+
+    cardUrlInput.addEventListener('input', () => {
+        cardUrlInput.setCustomValidity(
+            !cardUrlInput.validity.valid
+                ? 'Please enter a valid URL'
+                : ''
+        );
+    });
+}
+
+initializeApp();
+setupEventListeners();
