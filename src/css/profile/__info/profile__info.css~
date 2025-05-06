@@ -14,7 +14,7 @@
 .profile__title-container {
     display: flex;
     align-items: center;
-    gap: 17px;
+    gap: 10px;
     margin-bottom: 8px;
 }
 
