@@ -4,31 +4,39 @@ export const validationSettings = {
     submitButtonSelector: '.popup__button',
     inactiveButtonClass: 'popup__button_disabled',
     inputErrorClass: 'popup__input_type_error',
-    errorClass: 'popup__error_visible'
+    errorClass: 'popup__error_visible',
+    errorElementSelector: '.popup__error'
 };
 
 export const defaultErrorMessages = {
     required: 'Это обязательное поле',
     minLength: (min, current) => `Минимальная длина - ${min} символа, сейчас ${current}`,
     maxLength: (max, current) => `Максимальная длина - ${max} символа, сейчас ${current}`,
-    patternMismatch: 'Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы',
-    urlMismatch: 'Введите URL-адрес начинающийся с http:// или https://'
+    patternMismatch: 'Разрешены только буквы, пробелы и дефисы',
+    urlMismatch: 'Введите URL-адрес (начинается с http:// или https://)',
+    imageUrlInvalid: 'Ссылка не ведет на изображение'
 };
 
 const namePattern = /^[\p{L}\s-]+$/u;
 
 function showInputError(form, input, errorMessage, settings) {
-    const errorElement = form.querySelector(`.${input.id}-error`);
-    input.classList.add(settings.inputErrorClass);
-    errorElement.textContent = errorMessage;
-    errorElement.classList.add(settings.errorClass);
+    const errorElement = form.querySelector(`#${input.id}-error`) ||
+        form.querySelector(settings.errorElementSelector);
+    if (errorElement) {
+        input.classList.add(settings.inputErrorClass);
+        errorElement.textContent = errorMessage;
+        errorElement.classList.add(settings.errorClass);
+    }
 }
 
 function hideInputError(form, input, settings) {
-    const errorElement = form.querySelector(`.${input.id}-error`);
-    input.classList.remove(settings.inputErrorClass);
-    errorElement.textContent = '';
-    errorElement.classList.remove(settings.errorClass);
+    const errorElement = form.querySelector(`#${input.id}-error`) ||
+        form.querySelector(settings.errorElementSelector);
+    if (errorElement) {
+        input.classList.remove(settings.inputErrorClass);
+        errorElement.textContent = '';
+        errorElement.classList.remove(settings.errorClass);
+    }
 }
 
 function getErrorMessage(input) {
@@ -53,8 +61,15 @@ function getErrorMessage(input) {
 function checkInputValidity(form, input, settings) {
     let isValid = input.validity.valid;
 
-    if (input.hasAttribute('data-name-pattern')) {
-        isValid = isValid && namePattern.test(input.value);
+    if (input.hasAttribute('data-name-pattern') && !namePattern.test(input.value)) {
+        isValid = false;
+        input.setCustomValidity(defaultErrorMessages.patternMismatch);
+    }
+    else if (input.type === 'url' && !/^https?:\/\//i.test(input.value)) {
+        isValid = false;
+        input.setCustomValidity(defaultErrorMessages.urlMismatch);
+    } else {
+        input.setCustomValidity('');
     }
 
     if (!isValid) {
@@ -66,11 +81,17 @@ function checkInputValidity(form, input, settings) {
 
 function toggleButtonState(form, inputs, button, settings) {
     const isValid = inputs.every(input => {
+        const basicValid = input.validity.valid;
         const patternValid = input.hasAttribute('data-name-pattern')
             ? namePattern.test(input.value)
             : true;
-        return input.validity.valid && patternValid;
+        const urlValid = input.type === 'url'
+            ? /^https?:\/\//i.test(input.value)
+            : true;
+
+        return basicValid && patternValid && urlValid;
     });
+
     button.disabled = !isValid;
     button.classList.toggle(settings.inactiveButtonClass, !isValid);
 }
@@ -86,6 +107,10 @@ function setupFormValidation(form, settings) {
             input.setAttribute('data-name-pattern', 'true');
             input.dataset.errorPattern = defaultErrorMessages.patternMismatch;
         }
+
+        if (input.type === 'url') {
+            input.dataset.errorUrl = defaultErrorMessages.urlMismatch;
+        }
     });
 
     inputs.forEach(input => {
@@ -99,6 +124,7 @@ function setupFormValidation(form, settings) {
         });
     });
 
+    // Handle form resets
     form.addEventListener('reset', () => {
         inputs.forEach(input => hideInputError(form, input, settings));
         toggleButtonState(form, inputs, button, settings);
@@ -110,6 +136,7 @@ function setupFormValidation(form, settings) {
 export function enableValidation(settings = validationSettings) {
     const forms = Array.from(document.querySelectorAll(settings.formSelector));
     forms.forEach(form => {
+        form.setAttribute('novalidate', '');
         setupFormValidation(form, settings);
     });
 }

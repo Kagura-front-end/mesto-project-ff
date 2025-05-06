@@ -1,4 +1,4 @@
-const cssContext = require.context('/src/css', true, /\.css$/i, 'sync');
+const cssContext = require.context('./css', true, /\.css$/i, 'sync');
 cssContext.keys().forEach(cssContext);
 
 import {
@@ -16,25 +16,63 @@ import {
     editSubmitButton,
     addSubmitButton,
     cardNameInput,
-    cardUrlInput
-} from '../src/js/constants.js';
+    cardUrlInput,
+    avatarPopup,
+    avatarForm,
+    avatarInput,
+    avatarSubmitButton,
+    profileAvatar,
+    avatarEditButton,
+    citiesList,
+    cardTemplate,
+    validationSettings
+} from  '../src/js/constants.js';
 
-import { initialPlaces } from './js/places.js';
 import { openModal, closeModal, setupPopup } from '../src/js/modal.js';
-import { createCard, toggleLike, deleteCard, renderCards } from '../src/js/card.js';
-import { handleEditFormSubmit, handleAddFormSubmit } from '../src/js/handlers.js';
-import { enableValidation, clearValidation, validationSettings } from '../src/js/validation.js';
+import { createCard, renderCards } from  '../src/js/card.js';
+import { enableValidation, clearValidation } from '../src/js/validation.js';
+import {
+    getUserInfo,
+    getInitialCards,
+    updateProfile,
+    likeCard,
+    unlikeCard,
+    deleteCard as apiDeleteCard,
+    addNewCard,
+    updateAvatar
+} from '../src/js/api.js';
 
+// DOM Elements
 const popupImage = imagePopup.querySelector('.popup__image');
 const popupCaption = imagePopup.querySelector('.popup__caption');
 
-enableValidation(validationSettings);
+function renderLoading(button, isLoading, text = 'Сохранить') {
+    button.textContent = isLoading ? 'Сохранение...' : text;
+}
 
+enableValidation(validationSettings);
 setupPopup(editPopup);
 setupPopup(addPopup);
 setupPopup(imagePopup);
+setupPopup(avatarPopup);
 
-renderCards(initialPlaces, handleImageClick);
+function handleLikeCard(cardId, likeButton, likeCount) {
+    const isLiked = likeButton.classList.contains('card__like-button_is-active');
+    const apiCall = isLiked ? unlikeCard(cardId) : likeCard(cardId);
+
+    apiCall
+        .then(updatedCard => {
+            likeCount.textContent = updatedCard.likes.length;
+            likeButton.classList.toggle('card__like-button_is-active');
+        })
+        .catch(err => console.error('Error updating like:', err));
+}
+
+function handleDeleteCard(cardId, cardElement) {
+    apiDeleteCard(cardId)
+        .then(() => cardElement.remove())
+        .catch(err => console.error('Error deleting card:', err));
+}
 
 function handleImageClick(cardInfo) {
     popupImage.src = cardInfo.link;
@@ -43,14 +81,22 @@ function handleImageClick(cardInfo) {
     openModal(imagePopup);
 }
 
+let currentUserId;
+
+Promise.all([getUserInfo(), getInitialCards()])
+    .then(([userData, cards]) => {
+        profileTitle.textContent = userData.name;
+        profileDescription.textContent = userData.about;
+        profileAvatar.style.backgroundImage = `url(${userData.avatar})`;
+        currentUserId = userData._id;
+        renderCards(cards, currentUserId, handleDeleteCard, handleLikeCard, handleImageClick);
+    })
+    .catch(err => console.error('Error loading data:', err));
+
 editButton.addEventListener('click', () => {
     nameInput.value = profileTitle.textContent;
     jobInput.value = profileDescription.textContent;
-
     clearValidation(editForm, validationSettings);
-    nameInput.dispatchEvent(new Event('input'));
-    jobInput.dispatchEvent(new Event('input'));
-
     openModal(editPopup);
 });
 
@@ -60,20 +106,54 @@ addButton.addEventListener('click', () => {
     openModal(addPopup);
 });
 
+avatarEditButton.addEventListener('click', () => {
+    avatarForm.reset();
+    clearValidation(avatarForm, validationSettings); // This will now work properly
+    openModal(avatarPopup);
+});
+
 editForm.addEventListener('submit', (evt) => {
     evt.preventDefault();
     if (editSubmitButton.disabled) return;
 
-    handleEditFormSubmit(evt);
-    closeModal(editPopup);
+    renderLoading(editSubmitButton, true);
+    updateProfile(nameInput.value, jobInput.value)
+        .then(userData => {
+            profileTitle.textContent = userData.name;
+            profileDescription.textContent = userData.about;
+            closeModal(editPopup);
+        })
+        .catch(err => console.error('Error updating profile:', err))
+        .finally(() => renderLoading(editSubmitButton, false));
 });
 
 addForm.addEventListener('submit', (evt) => {
     evt.preventDefault();
     if (addSubmitButton.disabled) return;
 
-    handleAddFormSubmit(evt, createCard, deleteCard, toggleLike, handleImageClick);
-    closeModal(addPopup);
+    renderLoading(addSubmitButton, true, 'Создать');
+    addNewCard(cardNameInput.value, cardUrlInput.value)
+        .then(newCard => {
+            renderCards([newCard], currentUserId, handleDeleteCard, handleLikeCard, handleImageClick);
+            addForm.reset();
+            closeModal(addPopup);
+        })
+        .catch(err => console.error('Error adding card:', err))
+        .finally(() => renderLoading(addSubmitButton, false, 'Создать'));
+});
+
+avatarForm.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+    if (avatarSubmitButton.disabled) return;
+
+    renderLoading(avatarSubmitButton, true);
+    updateAvatar(avatarInput.value)
+        .then(userData => {
+            profileAvatar.style.backgroundImage = `url(${userData.avatar})`;
+            closeModal(avatarPopup);
+        })
+        .catch(err => console.error('Error updating avatar:', err))
+        .finally(() => renderLoading(avatarSubmitButton, false));
 });
 
 cardNameInput.addEventListener('input', () => {

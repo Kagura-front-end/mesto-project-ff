@@ -1,6 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -11,7 +11,6 @@ module.exports = {
     output: {
         filename: 'main.js',
         path: path.resolve(__dirname, 'dist'),
-        /*publicPath: '/'*/
     },
     devServer: {
         static: './dist',
@@ -20,12 +19,17 @@ module.exports = {
         compress: true,
         port: 8080
     },
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, 'src'),
+        },
+    },
     module: {
         rules: [
             {
                 test: /\.js$/,
                 use: 'babel-loader',
-                exclude: '/node_modules/'
+                exclude: /node_modules/
             },
             {
                 test: /\.(png|jpg|svg|gif)$/,
@@ -37,7 +41,20 @@ module.exports = {
             {
                 test: /\.css$/i,
                 use: [
-                    isDev ? 'style-loader' : MiniCssExtractPlugin.loader, 'css-loader',
+                    isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 1,
+                            url: true,
+                            modules: false,
+                            resolve: {
+                                alias: {
+                                    '@': path.resolve(__dirname, 'src'),
+                                }
+                            }
+                        }
+                    },
                     {
                         loader: 'postcss-loader',
                         options: {
