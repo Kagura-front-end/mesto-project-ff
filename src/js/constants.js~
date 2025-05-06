@@ -3,7 +3,6 @@ export const addPopup = document.querySelector('.popup_type_new-card');
 export const imagePopup = document.querySelector('.popup_type_image');
 export const avatarPopup = document.querySelector('.popup_type_avatar');
 
-
 export const editButton = document.querySelector('.profile__edit-button');
 export const addButton = document.querySelector('.profile__add-button');
 export const avatarEditButton = document.querySelector('.profile__avatar-edit-button');
@@ -16,8 +15,6 @@ export const editForm = document.querySelector('.popup__form[name="edit-profile"
 export const addForm = document.querySelector('.popup__form[name="new-place"]');
 export const avatarForm = document.querySelector('.popup__form[name="update-avatar"]');
 
-export const confirmPopup = document.querySelector('.popup_type_confirm');
-export const confirmButton = confirmPopup.querySelector('.popup__confirm-button');
 
 export const nameInput = editForm.querySelector('.popup__input_type_name');
 export const jobInput = editForm.querySelector('.popup__input_type_description');

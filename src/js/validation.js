@@ -64,8 +64,7 @@ function checkInputValidity(form, input, settings) {
     if (input.hasAttribute('data-name-pattern') && !namePattern.test(input.value)) {
         isValid = false;
         input.setCustomValidity(defaultErrorMessages.patternMismatch);
-    }
-    else if (input.type === 'url' && !/^https?:\/\//i.test(input.value)) {
+    } else if (input.type === 'url' && !/^https?:\/\//i.test(input.value)) {
         isValid = false;
         input.setCustomValidity(defaultErrorMessages.urlMismatch);
     } else {

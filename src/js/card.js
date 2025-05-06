@@ -1,4 +1,12 @@
-import { cardTemplate, citiesList } from './constants.js';
+import {
+    cardTemplate,
+    citiesList,
+    confirmPopup,
+    confirmButton
+} from './constants.js';
+import {openModal, closeModal} from './modal.js';
+
+let cardToDelete = null;
 
 export function createCard(cardData, currentUserId, handleDelete, handleLike, handleImageClick) {
     const card = cardTemplate.querySelector('.card').cloneNode(true);
@@ -14,7 +22,14 @@ export function createCard(cardData, currentUserId, handleDelete, handleLike, ha
     likeCount.textContent = cardData.likes.length;
 
     if (cardData.owner._id === currentUserId) {
-        deleteButton.addEventListener('click', () => handleDelete(cardData._id, card));
+        deleteButton.addEventListener('click', () => {
+            cardToDelete = {
+                id: cardData._id,
+                element: card,
+                callback: () => handleDelete(cardData._id, card)
+            };
+            openModal(confirmPopup);
+        });
     } else {
         deleteButton.remove();
     }
@@ -28,11 +43,18 @@ export function createCard(cardData, currentUserId, handleDelete, handleLike, ha
     return card;
 }
 
-export function renderCards(cards, currentUserId, handleDelete, handleLike, handleImageClick) {
-    while (citiesList.firstChild) {
-        citiesList.removeChild(citiesList.firstChild);
-    }
+export function setupDeleteConfirmation() {
+    confirmButton.addEventListener('click', () => {
+        if (cardToDelete) {
+            cardToDelete.callback();
+            closeModal(confirmPopup);
+            cardToDelete = null;
+        }
+    });
+}
 
+export function renderCards(cards, currentUserId, handleDelete, handleLike, handleImageClick) {
+    citiesList.innerHTML = '';
     const fragment = document.createDocumentFragment();
 
     cards.forEach(cardData => {
@@ -42,8 +64,4 @@ export function renderCards(cards, currentUserId, handleDelete, handleLike, hand
     });
 
     citiesList.appendChild(fragment);
-}
-
-export function toggleLike(evt) {
-    evt.target.classList.toggle('card__like-button_is-active');
 }

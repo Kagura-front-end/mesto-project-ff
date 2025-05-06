@@ -1,6 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -48,11 +48,11 @@ module.exports = {
                             importLoaders: 1,
                             url: true,
                             modules: false,
-                            resolve: {
-                                alias: {
-                                    '@': path.resolve(__dirname, 'src'),
-                                }
-                            }
+                            /*  resolve: {
+                                  alias: {
+                                      '@': path.resolve(__dirname, 'src'),
+                                  }
+                              }*/
                         }
                     },
                     {

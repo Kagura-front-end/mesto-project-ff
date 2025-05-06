@@ -7,12 +7,12 @@ import {
     editSubmitButton, addSubmitButton, cardNameInput, cardUrlInput,
     avatarPopup, avatarForm, avatarInput, avatarSubmitButton,
     profileAvatar, avatarEditButton, citiesList, cardTemplate,
-    validationSettings
+    validationSettings, confirmPopup
 } from '../src/js/constants.js';
 
-import { openModal, closeModal, setupPopup } from '../src/js/modal.js';
-import { createCard, renderCards } from '../src/js/card.js';
-import { enableValidation, clearValidation } from '../src/js/validation.js';
+import {openModal, closeModal, setupPopup} from '../src/js/modal.js';
+import {createCard, renderCards, setupDeleteConfirmation} from '../src/js/card.js';
+import {enableValidation, clearValidation} from '../src/js/validation.js';
 import {
     getUserInfo, getInitialCards, updateProfile, likeCard,
     unlikeCard, deleteCard as apiDeleteCard, addNewCard, updateAvatar
@@ -24,6 +24,9 @@ const popupCaption = imagePopup.querySelector('.popup__caption');
 function renderLoading(button, isLoading, text = 'Сохранить') {
     button.textContent = isLoading ? 'Сохранение...' : text;
 }
+
+setupPopup(confirmPopup);
+setupDeleteConfirmation();
 
 enableValidation(validationSettings);
 setupPopup(editPopup);
@@ -44,8 +47,12 @@ function handleLikeCard(cardId, likeButton, likeCount) {
 
 function handleDeleteCard(cardId, cardElement) {
     apiDeleteCard(cardId)
-        .then(() => cardElement.remove())
-        .catch(err => console.error('Error deleting card:', err));
+        .then(() => {
+            cardElement.remove();
+        })
+        .catch(err => {
+            console.error('Error deleting card:', err);
+        });
 }
 
 function handleImageClick(cardInfo) {

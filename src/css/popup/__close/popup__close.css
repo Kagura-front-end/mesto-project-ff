@@ -18,3 +18,16 @@
 .popup__close:hover {
     opacity: 0.6;
 }
+
+.popup_type_confirm .popup__content {
+    min-height: auto;
+}
+
+.popup__actions {
+    display: flex;
+    justify-content: center;
+}
+
+.popup__confirm-button {
+    width: 100%;
+}
