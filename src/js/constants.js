@@ -30,7 +30,7 @@ export const addSubmitButton = addForm.querySelector('.popup__button');
 export const avatarInput = document.getElementById('avatar-input');
 export const avatarSubmitButton = avatarForm.querySelector('.popup__button');
 export const citiesList = document.querySelector('.places__list');
-export const cardTemplate = document.querySelector('#card-template').content;
+export const cardTemplate = document.querySelector('#card-template').content.querySelector('.card');
 
 export const validationSettings = {
     formSelector: '.popup__form',

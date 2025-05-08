@@ -1,67 +1,51 @@
-import {
-    cardTemplate,
-    citiesList,
-    confirmPopup,
-    confirmButton
-} from './constants.js';
-import {openModal, closeModal} from './modal.js';
+import { cardTemplate } from './constants.js';
 
-let cardToDelete = null;
-
-export function createCard(cardData, currentUserId, handleDelete, handleLike, handleImageClick) {
-    const card = cardTemplate.querySelector('.card').cloneNode(true);
-    const cardImage = card.querySelector('.card__image');
-    const cardTitle = card.querySelector('.card__title');
-    const deleteButton = card.querySelector('.card__delete-button');
-    const likeButton = card.querySelector('.card__like-button');
-    const likeCount = card.querySelector('.card__like-count');
+export function createCard(cardData, currentUserId, handleDeleteClick, handleLikeClick, handleImageClick) {
+    const cardElement = cardTemplate.cloneNode(true);
+    const cardImage = cardElement.querySelector('.card__image');
+    const cardTitle = cardElement.querySelector('.card__title');
+    const likeButton = cardElement.querySelector('.card__like-button');
+    const likeCount = cardElement.querySelector('.card__like-count');
+    const deleteButton = cardElement.querySelector('.card__delete-button');
 
     cardImage.src = cardData.link;
     cardImage.alt = cardData.name;
     cardTitle.textContent = cardData.name;
-    likeCount.textContent = cardData.likes.length;
 
-    if (cardData.owner._id === currentUserId) {
-        deleteButton.addEventListener('click', () => {
-            cardToDelete = {
-                id: cardData._id,
-                element: card,
-                callback: () => handleDelete(cardData._id, card)
-            };
-            openModal(confirmPopup);
-        });
-    } else {
-        deleteButton.remove();
+    const isLiked = cardData.likes?.some(user => user._id === currentUserId) || false;
+    if (isLiked) {
+        likeButton.classList.add('card__like-button_is-active');
+    }
+    likeCount.textContent = cardData.likes?.length || 0;
+
+    if (cardData.owner?._id !== currentUserId) {
+        deleteButton.style.display = 'none';
     }
 
-    const isLiked = cardData.likes.some(like => like._id === currentUserId);
-    likeButton.classList.toggle('card__like-button_is-active', isLiked);
-
-    likeButton.addEventListener('click', () => handleLike(cardData._id, likeButton, likeCount));
+    likeButton.addEventListener('click', () => handleLikeClick(cardData._id, likeButton, likeCount));
+    deleteButton.addEventListener('click', () => handleDeleteClick(cardData._id, cardElement));
     cardImage.addEventListener('click', () => handleImageClick(cardData));
 
-    return card;
+    return cardElement;
+}
+
+export function renderCards(cards, currentUserId, handleDeleteClick, handleLikeClick, handleImageClick) {
+    const cardsList = document.querySelector('.places__list');
+    if (!cardsList) return;
+
+    cardsList.innerHTML = '';
+
+    cards.forEach(cardData => {
+        const cardElement = createCard(
+            cardData,
+            currentUserId,
+            handleDeleteClick,
+            handleLikeClick,
+            handleImageClick
+        );
+        cardsList.append(cardElement);
+    });
 }
 
 export function setupDeleteConfirmation() {
-    confirmButton.addEventListener('click', () => {
-        if (cardToDelete) {
-            cardToDelete.callback();
-            closeModal(confirmPopup);
-            cardToDelete = null;
-        }
-    });
-}
-
-export function renderCards(cards, currentUserId, handleDelete, handleLike, handleImageClick) {
-    citiesList.innerHTML = '';
-    const fragment = document.createDocumentFragment();
-
-    cards.forEach(cardData => {
-        fragment.appendChild(
-            createCard(cardData, currentUserId, handleDelete, handleLike, handleImageClick)
-        );
-    });
-
-    citiesList.appendChild(fragment);
 }
