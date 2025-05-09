@@ -111,3 +111,5 @@ export const updateProfile = (name, about) => {
     })
         .then(checkResponse);
 };
+
+

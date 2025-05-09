@@ -2,7 +2,7 @@ export const defaultErrorMessages = {
     required: 'Это обязательное поле',
     minLength: (min, current) => `Минимальная длина - ${min} символа, сейчас ${current}`,
     maxLength: (max, current) => `Максимальная длина - ${max} символа, сейчас ${current}`,
-    patternMismatch: 'Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы',
+    patternMismatch: 'Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы.',
 };
 
 const unicodeTextPattern = /^[\p{L}\s-]+$/u;
