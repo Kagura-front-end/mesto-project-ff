@@ -1,23 +1,11 @@
-export const validationSettings = {
-    formSelector: '.popup__form',
-    inputSelector: '.popup__input',
-    submitButtonSelector: '.popup__button',
-    inactiveButtonClass: 'popup__button_disabled',
-    inputErrorClass: 'popup__input_type_error',
-    errorClass: 'popup__error_visible',
-    errorElementSelector: '.popup__error'
-};
-
 export const defaultErrorMessages = {
     required: 'Это обязательное поле',
     minLength: (min, current) => `Минимальная длина - ${min} символа, сейчас ${current}`,
     maxLength: (max, current) => `Максимальная длина - ${max} символа, сейчас ${current}`,
     patternMismatch: 'Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы',
-    urlMismatch: 'Введите URL-адрес (начинается с http:// или https://)',
-    imageUrlInvalid: 'Ссылка не ведет на изображение'
 };
 
-const namePattern = /^[\p{L}\s-]+$/u;
+const unicodeTextPattern = /^[\p{L}\s-]+$/u;
 
 function showInputError(form, input, errorMessage, settings) {
     const errorElement = form.querySelector(`#${input.id}-error`) ||
@@ -39,91 +27,67 @@ function hideInputError(form, input, settings) {
     }
 }
 
-function getErrorMessage(input) {
+function getErrorMessage(input, defaultMessages) {
     if (input.validity.valueMissing) {
-        return input.dataset.errorRequired || defaultErrorMessages.required;
+        return input.dataset.errorRequired || defaultMessages.required;
     }
     if (input.validity.tooShort) {
-        return defaultErrorMessages.minLength(input.minLength, input.value.length);
+        return defaultMessages.minLength(input.minLength, input.value.length);
     }
     if (input.validity.tooLong) {
-        return defaultErrorMessages.maxLength(input.maxLength, input.value.length);
+        return defaultMessages.maxLength(input.maxLength, input.value.length);
     }
-    if (input.hasAttribute('data-name-pattern') && !namePattern.test(input.value)) {
-        return input.dataset.errorPattern || defaultErrorMessages.patternMismatch;
+    if (input.validity.patternMismatch) {
+        return defaultMessages.patternMismatch;
     }
-    if (input.validity.typeMismatch && input.type === 'url') {
-        return input.dataset.errorUrl || defaultErrorMessages.urlMismatch;
+    if (
+        input.classList.contains('popup__input_type_name') ||
+        input.classList.contains('popup__input_type_description') ||
+        input.classList.contains('popup__input_type_card-name')
+    ) {
+        if (!unicodeTextPattern.test(input.value)) {
+            return defaultMessages.patternMismatch;
+        }
     }
     return input.validationMessage;
 }
 
-function checkInputValidity(form, input, settings) {
-    let isValid = input.validity.valid;
-
-    if (input.hasAttribute('data-name-pattern') && !namePattern.test(input.value)) {
-        isValid = false;
-        input.setCustomValidity(defaultErrorMessages.patternMismatch);
-    } else if (input.type === 'url' && !/^https?:\/\//i.test(input.value)) {
-        isValid = false;
-        input.setCustomValidity(defaultErrorMessages.urlMismatch);
-    } else {
-        input.setCustomValidity('');
-    }
-
-    if (!isValid) {
-        showInputError(form, input, getErrorMessage(input), settings);
+function checkInputValidity(form, input, settings, messages) {
+    if (!input.validity.valid || (input.classList.contains('popup__input_type_name') ||
+        input.classList.contains('popup__input_type_description') ||
+        input.classList.contains('popup__input_type_card-name')) && !unicodeTextPattern.test(input.value)) {
+        showInputError(form, input, getErrorMessage(input, messages), settings);
     } else {
         hideInputError(form, input, settings);
     }
 }
 
 function toggleButtonState(form, inputs, button, settings) {
-    const isValid = inputs.every(input => {
-        const basicValid = input.validity.valid;
-        const patternValid = input.hasAttribute('data-name-pattern')
-            ? namePattern.test(input.value)
-            : true;
-        const urlValid = input.type === 'url'
-            ? /^https?:\/\//i.test(input.value)
-            : true;
-
-        return basicValid && patternValid && urlValid;
-    });
-
+    const isValid = inputs.every(input =>
+        input.validity.valid &&
+        (!(input.classList.contains('popup__input_type_name') ||
+            input.classList.contains('popup__input_type_description') ||
+            input.classList.contains('popup__input_type_card-name')) || unicodeTextPattern.test(input.value))
+    );
     button.disabled = !isValid;
     button.classList.toggle(settings.inactiveButtonClass, !isValid);
 }
 
-function setupFormValidation(form, settings) {
+function setupFormValidation(form, settings, messages) {
     const inputs = Array.from(form.querySelectorAll(settings.inputSelector));
     const button = form.querySelector(settings.submitButtonSelector);
 
     inputs.forEach(input => {
-        if (input.classList.contains('popup__input_type_name') ||
-            input.classList.contains('popup__input_type_description') ||
-            input.classList.contains('popup__input_type_card-name')) {
-            input.setAttribute('data-name-pattern', 'true');
-            input.dataset.errorPattern = defaultErrorMessages.patternMismatch;
-        }
-
-        if (input.type === 'url') {
-            input.dataset.errorUrl = defaultErrorMessages.urlMismatch;
-        }
-    });
-
-    inputs.forEach(input => {
         input.addEventListener('input', () => {
-            checkInputValidity(form, input, settings);
+            checkInputValidity(form, input, settings, messages);
             toggleButtonState(form, inputs, button, settings);
         });
 
         input.addEventListener('blur', () => {
-            checkInputValidity(form, input, settings);
+            checkInputValidity(form, input, settings, messages);
         });
     });
 
-    // Handle form resets
     form.addEventListener('reset', () => {
         inputs.forEach(input => hideInputError(form, input, settings));
         toggleButtonState(form, inputs, button, settings);
@@ -132,15 +96,15 @@ function setupFormValidation(form, settings) {
     toggleButtonState(form, inputs, button, settings);
 }
 
-export function enableValidation(settings = validationSettings) {
+export function enableValidation(settings, messages = defaultErrorMessages) {
     const forms = Array.from(document.querySelectorAll(settings.formSelector));
     forms.forEach(form => {
         form.setAttribute('novalidate', '');
-        setupFormValidation(form, settings);
+        setupFormValidation(form, settings, messages);
     });
 }
 
-export function clearValidation(form, settings = validationSettings) {
+export function clearValidation(form, settings) {
     const inputs = Array.from(form.querySelectorAll(settings.inputSelector));
     const button = form.querySelector(settings.submitButtonSelector);
 

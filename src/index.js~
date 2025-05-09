@@ -213,11 +213,9 @@ function setupEventListeners() {
             .finally(() => renderLoading(avatarSubmitButton, false));
     });
 }
-(async () => {
-    try {
-        await initializeApp();
-        setupEventListeners();
-    } catch (err) {
-        console.error('Не удалось инициализировать приложение:', err);
-    }
-})();
+try {
+    initializeApp();
+    setupEventListeners();
+} catch (err) {
+    console.error('Не удалось инициализировать приложение:', err);
+}

@@ -35,3 +35,29 @@
 
 
 
+/* Container for each input+error pair */
+.popup__field-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+/* Error message positioning */
+.popup__error {
+    position: absolute;
+    bottom: -18px;
+    left: 0;
+    color: red;
+    font-size: 12px;
+    line-height: 15px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.popup__error_visible {
+    opacity: 1;
+}
+
+/* Remove any existing margin/padding that might interfere */
+.popup__input {
+    margin-bottom: 5px;
+}

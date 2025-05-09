@@ -18,13 +18,12 @@ export function createCard(cardData, currentUserId, handleDeleteClick, handleLik
     }
     likeCount.textContent = cardData.likes?.length || 0;
 
-    if (cardData.owner?._id === currentUserId) {
-        deleteButton.addEventListener('click', () => handleDeleteClick(cardData._id, cardElement));
-    } else {
+    if (cardData.owner?._id !== currentUserId) {
         deleteButton.style.display = 'none';
     }
 
     likeButton.addEventListener('click', () => handleLikeClick(cardData._id, likeButton, likeCount));
+    deleteButton.addEventListener('click', () => handleDeleteClick(cardData._id, cardElement));
     cardImage.addEventListener('click', () => handleImageClick(cardData));
 
     return cardElement;
