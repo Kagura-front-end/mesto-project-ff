@@ -1,4 +1,4 @@
-import { cardTemplate } from './constants.js';
+import {cardTemplate} from './constants.js';
 
 export function createCard(cardData, currentUserId, handleDeleteClick, handleLikeClick, handleImageClick) {
     const cardElement = cardTemplate.cloneNode(true);

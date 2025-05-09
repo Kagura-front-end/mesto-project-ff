@@ -17,7 +17,6 @@ export const addForm = document.querySelector('.popup__form[name="new-place"]');
 export const avatarForm = document.querySelector('.popup__form[name="update-avatar"]');
 
 export const confirmPopup = document.querySelector('.popup_type_confirm');
-export const confirmButton = confirmPopup.querySelector('.popup__confirm-button');
 
 export const nameInput = editForm.querySelector('.popup__input_type_name');
 export const jobInput = editForm.querySelector('.popup__input_type_description');

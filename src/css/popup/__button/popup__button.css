@@ -27,14 +27,12 @@
     border: 1px solid black;
 }
 
-/* Active/pressed button styles */
 .popup__button:active {
     background: white;
     border: 1px solid #C4C4C4;
     color: #C4C4C4;
 }
 
-/* Hover state for enabled buttons */
 .popup__button:not(.popup__button_disabled):hover {
     opacity: 0.8;
 }

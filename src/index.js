@@ -213,6 +213,7 @@ function setupEventListeners() {
             .finally(() => renderLoading(avatarSubmitButton, false));
     });
 }
+
 (async () => {
     try {
         await initializeApp();
